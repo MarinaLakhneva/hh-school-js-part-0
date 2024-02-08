@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "postinstall": "ln -sf $(pwd)/githooks/* .git/hooks",
-    "testrun": "node index.js"
+    "testrun": "node new.ts"
   },
   "devDependencies": {
     "eslint": "8.29.0",
