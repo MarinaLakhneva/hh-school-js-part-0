@@ -1,20 +1,16 @@
-// Test utils
-
-const testBlock = (name) => {
+const testBlock = (name: string): void => {
     console.groupEnd();
     console.group(`# ${name}\n`);
 };
 
-const areEqual = (a, b) => {
+const areEqual = (a: unknown, b: unknown): boolean => {
     if (Array.isArray(a) && Array.isArray(b)) {
-        return JSON.stringify(a) === JSON.stringify(b);
+        return JSON.stringify(a, Object.keys(a).sort()) === JSON.stringify(b, Object.keys(b).sort());
     }
     return a === b;
-    // Compare arrays of primitives
-    // Remember: [] !== []
 };
 
-const test = (whatWeTest, actualResult, expectedResult) => {
+const test = (whatWeTest: string, actualResult: unknown, expectedResult: unknown): void => {
     if (areEqual(actualResult, expectedResult)) {
         console.log(`[OK] ${whatWeTest}\n`);
     } else {
@@ -27,19 +23,15 @@ const test = (whatWeTest, actualResult, expectedResult) => {
     }
 };
 
-// Functions
-
-const getType = (value) => {
+const getType = (value: unknown): string => {
     return typeof value;
-    // Return string with a native JS type of value
 };
 
-const getTypesOfItems = (arr) => {
+const getTypesOfItems = (arr: unknown[]): string[] => {
     return arr.map((item) => typeof item);
-    // Return array with types of items of given array
 };
 
-const allItemsHaveTheSameType = (arr) => {
+const allItemsHaveTheSameType = (arr: unknown[]): boolean => {
     if (arr == null || arr.length === 0) {
         return true;
     }
@@ -56,7 +48,7 @@ const allItemsHaveTheSameType = (arr) => {
     return true;
 };
 
-const realTypeOf = (val) => {
+const realTypeOf = (val: unknown): string => {
     if (Number.isNaN(val)) {
         return 'NaN';
     }
@@ -69,39 +61,28 @@ const realTypeOf = (val) => {
     return Object.prototype.toString.call(val).slice(8, -1).toLowerCase();
 };
 
-const getRealTypesOfItems = (arr) => {
+const getRealTypesOfItems = (arr: unknown[]): string[] => {
     return arr.map((item) => realTypeOf(item));
-    // Return array with real types of items of given array
 };
 
-const everyItemHasAUniqueRealType = (arr) => {
+const everyItemHasAUniqueRealType = (arr: unknown[]): boolean => {
     if (arr == null || arr.length === 0) {
         return true;
     }
 
     return new Set(arr.map((item) => realTypeOf(item))).size === arr.length;
-    // Return true if there are no items in array
-    // with the same real type
 };
 
-const countRealTypes = (arr) => {
-    return Object.entries(
-        arr.reduce((acc, val) => {
-            acc[realTypeOf(val)] = (acc[realTypeOf(val)] || 0) + 1;
-            console.log(acc)
-            return acc;
-
-        }, {})
-    ).sort();
-    // Return an array of arrays with a type and count of items
-    // with this type in the input array, sorted by type.
-    // Like an Object.entries() result: [['boolean', 3], ['string', 5]]
+const countRealTypes = (arr: unknown[]): [string, number][] => {
+    let array = [];
+    array = Object.entries(arr.reduce((acc, val) => {
+        acc[realTypeOf(val)] = (acc[realTypeOf(val)] || 0) + 1;
+        return acc;
+    }, {}));
+    return array.sort();
 };
-
-// Tests
 
 testBlock('getType');
-
 test('Boolean', getType(true), 'boolean');
 test('Number', getType(123), 'number');
 test('String', getType('whoo'), 'string');
@@ -114,22 +95,20 @@ test(
 );
 test('Undefined', getType(undefined), 'undefined');
 test('Null', getType(null), 'object');
-
 testBlock('allItemsHaveTheSameType');
-
 test('All values are numbers', allItemsHaveTheSameType([11, 12, 13]), true);
 
 test('All values are strings', allItemsHaveTheSameType(['11', '12', '13']), true);
 
 test('All values are strings but wait', allItemsHaveTheSameType(['11', new String('12'), '13']), false);
 
-test('Values like a number', allItemsHaveTheSameType([123, 123 / 'a', 1 / 0]), true);
+test('Values like a number', allItemsHaveTheSameType([123, 123 / +('a'), 1 / 0]), true);
 
 test('Values like an object', allItemsHaveTheSameType([{}]), true);
 
 testBlock('getTypesOfItems VS getRealTypesOfItems');
 
-const knownTypes = [
+const knownTypes: any[] = [
     true,
     32,
     'string',
@@ -175,29 +154,20 @@ test('Check real types', getRealTypesOfItems(knownTypes), [
     'date',
     'regexp',
     'set',
-    // What else?
 ]);
 
 testBlock('everyItemHasAUniqueRealType');
-
 test('All value types in the array are unique', everyItemHasAUniqueRealType([true, 123, '123']), true);
-
-test('Two values have the same type', everyItemHasAUniqueRealType([true, 123, '123' === 123]), false);
-
+test('Two values have the same type', everyItemHasAUniqueRealType([true, 123, +('123') === 123]), false);
 test('There are no repeated types in knownTypes', everyItemHasAUniqueRealType(knownTypes), true);
-
 testBlock('countRealTypes');
-
 test('Count unique types of array items', countRealTypes([true, null, !null, !!null, {}]), [
     ['boolean', 3],
     ['null', 1],
     ['object', 1],
 ]);
-
 test('Counted unique types are sorted', countRealTypes([{}, null, true, !null, !!null]), [
     ['boolean', 3],
     ['null', 1],
     ['object', 1],
 ]);
-
-// Add several positive and negative tests
