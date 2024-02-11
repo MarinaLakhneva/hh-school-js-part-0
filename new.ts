@@ -3,14 +3,14 @@ const testBlock = (name: string): void => {
     console.group(`# ${name}\n`);
 };
 
-const areEqual = (a: any, b: any): boolean => {
+const areEqual = (a: unknown, b: unknown): boolean => {
     if (Array.isArray(a) && Array.isArray(b)) {
-        return JSON.stringify(a) === JSON.stringify(b);
+        return JSON.stringify(a, Object.keys(a).sort()) === JSON.stringify(b, Object.keys(b).sort());
     }
     return a === b;
 };
 
-const test = (whatWeTest: string, actualResult: any, expectedResult: any): void => {
+const test = (whatWeTest: string, actualResult: unknown, expectedResult: unknown): void => {
     if (areEqual(actualResult, expectedResult)) {
         console.log(`[OK] ${whatWeTest}\n`);
     } else {
@@ -23,15 +23,15 @@ const test = (whatWeTest: string, actualResult: any, expectedResult: any): void 
     }
 };
 
-const getType = (value: any): string => {
+const getType = (value: unknown): string => {
     return typeof value;
 };
 
-const getTypesOfItems = (arr: any[]): string[] => {
+const getTypesOfItems = (arr: unknown[]): string[] => {
     return arr.map((item) => typeof item);
 };
 
-const allItemsHaveTheSameType = (arr: any[]): boolean => {
+const allItemsHaveTheSameType = (arr: unknown[]): boolean => {
     if (arr == null || arr.length === 0) {
         return true;
     }
@@ -48,7 +48,7 @@ const allItemsHaveTheSameType = (arr: any[]): boolean => {
     return true;
 };
 
-const realTypeOf = (val: any): string => {
+const realTypeOf = (val: unknown): string => {
     if (Number.isNaN(val)) {
         return 'NaN';
     }
@@ -61,11 +61,11 @@ const realTypeOf = (val: any): string => {
     return Object.prototype.toString.call(val).slice(8, -1).toLowerCase();
 };
 
-const getRealTypesOfItems = (arr: any[]): string[] => {
+const getRealTypesOfItems = (arr: unknown[]): string[] => {
     return arr.map((item) => realTypeOf(item));
 };
 
-const everyItemHasAUniqueRealType = (arr: any[]): boolean => {
+const everyItemHasAUniqueRealType = (arr: unknown[]): boolean => {
     if (arr == null || arr.length === 0) {
         return true;
     }
@@ -73,7 +73,7 @@ const everyItemHasAUniqueRealType = (arr: any[]): boolean => {
     return new Set(arr.map((item) => realTypeOf(item))).size === arr.length;
 };
 
-const countRealTypes = (arr: any[]): [string, number][] => {
+const countRealTypes = (arr: unknown[]): [string, number][] => {
     let array = [];
     array = Object.entries(arr.reduce((acc, val) => {
         acc[realTypeOf(val)] = (acc[realTypeOf(val)] || 0) + 1;
